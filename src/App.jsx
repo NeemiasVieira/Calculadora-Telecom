@@ -71,12 +71,10 @@ function App() {
   const SNc = document.querySelector(".SNC");
   const SNd = document.querySelector(".SND");
 
-
-
-  function Limpar(){
+  function Limpar() {
     const inputs = document.getElementsByClassName("input");
     console.log(inputs);
-    for (let i = 0; i<6; i++){
+    for (let i = 0; i < 6; i++) {
       inputs[i].value = "";
     }
     setAmp("");
@@ -86,7 +84,6 @@ function App() {
     setPotrui("");
     setSntx("");
   }
-
 
   function CalculaSinais(e) {
     e.preventDefault();
@@ -109,13 +106,13 @@ function App() {
     Limpar();
   }
 
-  function CalculaRuido(pontob, pontoc, pontod){
+  function CalculaRuido(pontob, pontoc, pontod) {
     //Ponto A
     const Ntx = -Number(sntx) + Number(pontoA);
     NA.innerHTML = Ntx.toFixed(2);
 
     //Ponto B
-    const Npontob = Number(Ntx) -Number(at1);
+    const Npontob = Number(Ntx) - Number(at1);
     NB.innerHTML = Npontob.toFixed(2);
 
     // S/N
@@ -126,7 +123,7 @@ function App() {
     Npontoc = converteParaWatts(Npontoc) + converteParaWatts(potrui);
     Npontoc = converteParaDbm(Npontoc);
     NC.innerHTML = Npontoc.toFixed(2);
-    
+
     // S/N
     SNc.innerHTML = (pontoc - Npontoc).toFixed(2);
 
@@ -146,8 +143,6 @@ function App() {
           <p>Neemias Vieira | RA: 170550</p>
           <p>Matheus Mota | RA: 185318 </p>
         </div>
-
-
       </Header>
 
       <AppStyle>
@@ -228,9 +223,7 @@ function App() {
             </div>
 
             <div className="divInput">
-              <label htmlFor="">
-                Potência de ruído do Amplificador 
-              </label>
+              <label htmlFor="">Potência de ruído do Amplificador</label>
               <div className="inputESelect">
                 <input
                   type="text"
