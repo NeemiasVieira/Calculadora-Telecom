@@ -17,9 +17,10 @@ export const AppStyle = styled.main`
     font-size: 1em;
     font-weight: 900;
     width: 125px;
-    border-radius: 5px;
+    border-radius: 7.5px;
     cursor: pointer;
     transition: all 300ms;
+    padding: 5px 0;
   }
 
   button:hover {
@@ -45,6 +46,27 @@ export const AppStyle = styled.main`
     gap: 30px;
   }
 
+  .alerta{
+    margin-bottom: 20px;
+    width: 235px;
+    font-weight: 900;
+    max-width: 235px;
+    max-height: 20px;
+    color: #f03;
+    margin: 2px 0;
+    transition: all 200ms;
+    overflow: visible;
+    text-align: center;
+  }
+
+  .hide{
+    opacity: 0;
+    max-width: .1px;
+    max-height: .1px;
+    transition: all 500ms;
+    overflow: hidden;
+  }
+
   .divInput {
     color: whitesmoke;
     height: auto;
@@ -55,6 +77,14 @@ export const AppStyle = styled.main`
     align-items: center;
     flex-flow: column wrap;
     border-radius: 10px;
+  }
+
+  .botoes{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
   }
 
   .inputESelect {
@@ -107,6 +137,11 @@ export const AppStyle = styled.main`
   }
 
   @media screen and (max-width: 480px) {
+
+    form{
+      margin-bottom: 10px;
+    }
+
     p {
       width: 90vw;
       font-size: 14px;
@@ -117,7 +152,8 @@ export const AppStyle = styled.main`
     }
 
     .EntradaSaida {
-      flex-flow: column wrap;
+      flex-flow: column-reverse wrap;
+      gap: 15px;
     }
     .divInput {
       width: 80vw;
@@ -134,7 +170,7 @@ export const AppStyle = styled.main`
     }
 
     table {
-      padding: 5px 15px;
+      padding: 0 15px;
     }
 
     label {

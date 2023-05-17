@@ -2,14 +2,16 @@ import React from "react";
 import Sistema from "./assets/img/Sistema.png";
 import { AppStyle } from "./AppStyle";
 import { Header } from "./AppStyle";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function converteParaWatts(dbm) {
+  if(dbm === 0) return 0
   const W = 10 ** ((dbm - 30) / 10);
   return W;
 }
 
 function converteParaDbm(w) {
+  if(w === 0) return 0
   const dbm = 10 * Math.log10(w / 1) + 30;
   return dbm;
 }
@@ -18,7 +20,6 @@ function elevaNum(num, select) {
   const valor = select.value;
   switch (valor) {
     case "db":
-      num = num;
       break;
     case "mW":
       num = num * 10 ** -3;
@@ -49,6 +50,7 @@ function App() {
   let [at2, setAt2] = useState();
   let [potrui, setPotrui] = useState();
   let [sntx, setSntx] = useState();
+  const [numeroPermitido, setNumeroPermitido] = useState(true);
   const select1 = document.querySelector("#operador1");
   const select2 = document.querySelector("#operador2");
   const select3 = document.querySelector("#operador3");
@@ -71,22 +73,61 @@ function App() {
   const SNc = document.querySelector(".SNC");
   const SNd = document.querySelector(".SND");
 
-  function Limpar() {
+  const VerificaNumero = (e) => {   
+    
+    const c = e.key.charCodeAt()
+    if ((c >= 48 && c <= 57) || c == 46 || c == 9 || c == 8 || c == 13 || c == 45 || c == 66 || c == 68){
+        setNumeroPermitido(true);
+        return true;
+    }
+    else{
+        setNumeroPermitido(false);
+        return false;
+    } 
+} 
+
+  function Limpar(e) {
+    e.preventDefault();
+    const paragrafoDeAlerta = document.querySelector(".alerta");
+    paragrafoDeAlerta.classList.add("hide");    
     const inputs = document.getElementsByClassName("input");
-    console.log(inputs);
     for (let i = 0; i < 6; i++) {
       inputs[i].value = "";
     }
+    const input1 = document.querySelector("#focus");
+    try{
+    SinalPontoA.innerHTML = "0";
+    SinalPontoB.innerHTML= "0";
+    SinalPontoC.innerHTML = "0";
+    SinalPontoD.innerHTML = "0";
+    NA.innerHTML = "0";
+    NB.innerHTML = "0";
+    NC.innerHTML = "0";
+    ND.innerHTML = "0";
+    SNa.innerHTML = "0";
+    SNb.innerHTML = "0";
+    SNc.innerHTML = "0";
+    SNd.innerHTML = "0";
+    }catch{}
+    
     setAmp("");
     setAt1("");
     setAt2("");
     setPontoA("");
     setPotrui("");
     setSntx("");
+
+    input1.focus();
   }
 
   function CalculaSinais(e) {
     e.preventDefault();
+    const paragrafoDeAlerta = document.querySelector(".alerta");
+    if(!amp || !at1 || !at2 || !pontoA || !potrui || !sntx){     
+      paragrafoDeAlerta.classList.remove("hide");
+      return 
+    }
+    paragrafoDeAlerta.classList.add("hide");    
     pontoA = elevaNum(pontoA, select1);
     at1 = elevaNum(at1, select2);
     amp = elevaNum(amp, select3);
@@ -97,13 +138,12 @@ function App() {
     const pontob = pontoA - Number(at1);
     const pontoc = pontob + Number(amp);
     const pontod = pontoc - Number(at2);
-    SinalPontoA.innerHTML = pontoA;
+    SinalPontoA.innerHTML = parseFloat(pontoA).toFixed(2);
     SinalPontoB.innerHTML = pontob.toFixed(2);
     SinalPontoC.innerHTML = pontoc.toFixed(2);
     SinalPontoD.innerHTML = pontod.toFixed(2);
-    SNa.innerHTML = sntx;
+    SNa.innerHTML = parseFloat(sntx).toFixed(2);
     CalculaRuido(pontob, pontoc, pontod);
-    Limpar();
   }
 
   function CalculaRuido(pontob, pontoc, pontod) {
@@ -162,11 +202,12 @@ function App() {
                 <input
                   type="text"
                   name=""
-                  id=""
+                  id="focus"
                   className="input"
                   placeholder="Digite um valor"
                   value={pontoA}
-                  onChange={(e) => setPontoA(e.target.value)}
+                  onKeyDown={(e) => (VerificaNumero(e))}       
+                  onChange={(e) => { numeroPermitido ? setPontoA(e.target.value) : e.target.value = ""}}
                 />
                 <select name="" id="operador1">
                   <option value="db">db</option>
@@ -187,8 +228,10 @@ function App() {
                   id=""
                   className="input"
                   placeholder="Digite um valor"
-                  value={at1}
-                  onChange={(e) => setAt1(e.target.value)}
+                  value={at1}         
+                  onKeyDown={(e) => (VerificaNumero(e))}       
+                  onChange={(e) => { numeroPermitido ? setAt1(e.target.value) : e.target.value = ""}}
+                  
                 />
                 <select name="" id="operador2">
                   <option value="db">db</option>
@@ -210,7 +253,8 @@ function App() {
                   className="input"
                   placeholder="Digite um valor"
                   value={amp}
-                  onChange={(e) => setAmp(e.target.value)}
+                  onKeyDown={(e) => (VerificaNumero(e))}       
+                  onChange={(e) => { numeroPermitido ? setAmp(e.target.value) : e.target.value = ""}}
                 />
                 <select name="" id="operador3">
                   <option value="db">db</option>
@@ -232,7 +276,8 @@ function App() {
                   className="input"
                   placeholder="Digite um valor"
                   value={potrui}
-                  onChange={(e) => setPotrui(e.target.value)}
+                  onKeyDown={(e) => (VerificaNumero(e))}       
+                  onChange={(e) => { numeroPermitido ? setPotrui(e.target.value) : e.target.value = ""}}
                 />
                 <select name="" id="operador4">
                   <option value="db">db</option>
@@ -254,7 +299,8 @@ function App() {
                   className="input"
                   placeholder="Digite um valor"
                   value={at2}
-                  onChange={(e) => setAt2(e.target.value)}
+                  onKeyDown={(e) => (VerificaNumero(e))}       
+                  onChange={(e) => { numeroPermitido ? setAt2(e.target.value) : e.target.value = ""}}
                 />
                 <select name="" id="operador5">
                   <option value="db">db</option>
@@ -275,7 +321,8 @@ function App() {
                   className="input"
                   placeholder="Digite um valor"
                   value={sntx}
-                  onChange={(e) => setSntx(e.target.value)}
+                  onKeyDown={(e) => (VerificaNumero(e))}       
+                  onChange={(e) => { numeroPermitido ? setSntx(e.target.value) : e.target.value = ""}}
                 />
                 <select name="" id="operador6">
                   <option value="db">db</option>
@@ -286,7 +333,11 @@ function App() {
                 </select>
               </div>
             </div>
+            <p className="alerta hide">Preencha todos os campos!</p>
+            <div className="botoes">            
             <button onClick={(e) => CalculaSinais(e)}>Calcular</button>
+            <button onClick={(e) => Limpar(e)}>Limpar</button>
+            </div>
           </form>
 
           <table>
