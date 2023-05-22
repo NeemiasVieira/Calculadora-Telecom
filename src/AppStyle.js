@@ -46,7 +46,7 @@ export const AppStyle = styled.main`
     gap: 30px;
   }
 
-  .alerta{
+  .alerta {
     margin-bottom: 20px;
     width: 235px;
     font-weight: 900;
@@ -59,10 +59,10 @@ export const AppStyle = styled.main`
     text-align: center;
   }
 
-  .hide{
+  .hide {
     opacity: 0;
-    max-width: .1px;
-    max-height: .1px;
+    max-width: 0.1px;
+    max-height: 0.1px;
     transition: all 500ms;
     overflow: hidden;
   }
@@ -79,7 +79,7 @@ export const AppStyle = styled.main`
     border-radius: 10px;
   }
 
-  .botoes{
+  .botoes {
     display: flex;
     flex-flow: row nowrap;
     justify-content: center;
@@ -137,8 +137,7 @@ export const AppStyle = styled.main`
   }
 
   @media screen and (max-width: 480px) {
-
-    form{
+    form {
       margin-bottom: 10px;
     }
 

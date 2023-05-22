@@ -2,24 +2,30 @@ import React from "react";
 import Sistema from "./assets/img/Sistema.png";
 import { AppStyle } from "./AppStyle";
 import { Header } from "./AppStyle";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { Tabela } from "./Componentes/Tabela/Tabela";
+import { Input } from "./Componentes/Input/Input";
 
 function converteParaWatts(dbm) {
-  if(dbm === 0) return 0
+  if (dbm === 0) return 0;
   const W = 10 ** ((dbm - 30) / 10);
   return W;
 }
 
 function converteParaDbm(w) {
-  if(w === 0) return 0
+  if (w === 0) return 0;
   const dbm = 10 * Math.log10(w / 1) + 30;
   return dbm;
 }
 
 function elevaNum(num, select) {
+  num = Number(num);
   const valor = select.value;
   switch (valor) {
     case "db":
+      break;
+    case "W":
+      num = converteParaDbm(num);
       break;
     case "mW":
       num = num * 10 ** -3;
@@ -44,19 +50,13 @@ function elevaNum(num, select) {
 }
 
 function App() {
-  let [pontoA, setPontoA] = useState();
-  let [at1, setAt1] = useState();
-  let [amp, setAmp] = useState();
-  let [at2, setAt2] = useState();
-  let [potrui, setPotrui] = useState();
-  let [sntx, setSntx] = useState();
-  const [numeroPermitido, setNumeroPermitido] = useState(true);
-  const select1 = document.querySelector("#operador1");
-  const select2 = document.querySelector("#operador2");
-  const select3 = document.querySelector("#operador3");
-  const select4 = document.querySelector("#operador4");
-  const select5 = document.querySelector("#operador5");
-  const select6 = document.querySelector("#operador6");
+  //#region Variáveis do App
+  let [pontoA, setPontoA] = useState("");
+  let [at1, setAt1] = useState("");
+  let [amp, setAmp] = useState("");
+  let [at2, setAt2] = useState("");
+  let [potrui, setPotrui] = useState("");
+  let [sntx, setSntx] = useState("");
 
   const SinalPontoA = document.querySelector(".SinalPontoA");
   const SinalPontoB = document.querySelector(".SinalPontoB");
@@ -73,104 +73,101 @@ function App() {
   const SNc = document.querySelector(".SNC");
   const SNd = document.querySelector(".SND");
 
-  const VerificaNumero = (e) => {   
-    
-    const c = e.key.charCodeAt()
-    if ((c >= 48 && c <= 57) || c == 46 || c == 9 || c == 8 || c == 13 || c == 45 || c == 66 || c == 68){
-        setNumeroPermitido(true);
-        return true;
-    }
-    else{
-        setNumeroPermitido(false);
-        return false;
-    } 
-} 
+  //#endregion
 
   function Limpar(e) {
     e.preventDefault();
     const paragrafoDeAlerta = document.querySelector(".alerta");
-    paragrafoDeAlerta.classList.add("hide");    
+    const input1 = document.querySelector("#focus");
     const inputs = document.getElementsByClassName("input");
+
+    paragrafoDeAlerta.classList.add("hide");
     for (let i = 0; i < 6; i++) {
       inputs[i].value = "";
     }
-    const input1 = document.querySelector("#focus");
-    try{
-    SinalPontoA.innerHTML = "0";
-    SinalPontoB.innerHTML= "0";
-    SinalPontoC.innerHTML = "0";
-    SinalPontoD.innerHTML = "0";
-    NA.innerHTML = "0";
-    NB.innerHTML = "0";
-    NC.innerHTML = "0";
-    ND.innerHTML = "0";
-    SNa.innerHTML = "0";
-    SNb.innerHTML = "0";
-    SNc.innerHTML = "0";
-    SNd.innerHTML = "0";
-    }catch{}
-    
+    try {
+      SinalPontoA.innerHTML = "0";
+      SinalPontoB.innerHTML = "0";
+      SinalPontoC.innerHTML = "0";
+      SinalPontoD.innerHTML = "0";
+      NA.innerHTML = "0";
+      NB.innerHTML = "0";
+      NC.innerHTML = "0";
+      ND.innerHTML = "0";
+      SNa.innerHTML = "0";
+      SNb.innerHTML = "0";
+      SNc.innerHTML = "0";
+      SNd.innerHTML = "0";
+    } catch {}
     setAmp("");
     setAt1("");
     setAt2("");
     setPontoA("");
     setPotrui("");
     setSntx("");
-
     input1.focus();
   }
 
   function CalculaSinais(e) {
     e.preventDefault();
     const paragrafoDeAlerta = document.querySelector(".alerta");
-    if(!amp || !at1 || !at2 || !pontoA || !potrui || !sntx){     
+    const select1 = document.querySelector("#operador1");
+    const select2 = document.querySelector("#operador2");
+    const select3 = document.querySelector("#operador3");
+    const select4 = document.querySelector("#operador4");
+    const select5 = document.querySelector("#operador5");
+    const select6 = document.querySelector("#operador6");
+    const V = {
+      //Valores para calculos
+      pontoA: elevaNum(pontoA, select1),
+      at1: elevaNum(at1, select2),
+      amp: elevaNum(amp, select3),
+      potrui: elevaNum(potrui, select4),
+      at2: elevaNum(at2, select5),
+      sntx: elevaNum(sntx, select6),
+    };
+    if (!amp || !at1 || !at2 || !pontoA || !potrui || !sntx) {
       paragrafoDeAlerta.classList.remove("hide");
-      return 
+      return;
     }
-    paragrafoDeAlerta.classList.add("hide");    
-    pontoA = elevaNum(pontoA, select1);
-    at1 = elevaNum(at1, select2);
-    amp = elevaNum(amp, select3);
-    potrui = elevaNum(potrui, select4);
-    at2 = elevaNum(at2, select5);
-    sntx = elevaNum(sntx, select6);
+    paragrafoDeAlerta.classList.add("hide");
 
-    const pontob = pontoA - Number(at1);
-    const pontoc = pontob + Number(amp);
-    const pontod = pontoc - Number(at2);
-    SinalPontoA.innerHTML = parseFloat(pontoA).toFixed(2);
+    const pontob = V.pontoA - Number(V.at1);
+    const pontoc = pontob + Number(V.amp);
+    const pontod = pontoc - Number(V.at2);
+
+    SinalPontoA.innerHTML = parseFloat(V.pontoA).toFixed(2);
     SinalPontoB.innerHTML = pontob.toFixed(2);
     SinalPontoC.innerHTML = pontoc.toFixed(2);
     SinalPontoD.innerHTML = pontod.toFixed(2);
-    SNa.innerHTML = parseFloat(sntx).toFixed(2);
-    CalculaRuido(pontob, pontoc, pontod);
+    SNa.innerHTML = parseFloat(V.sntx).toFixed(2);
+
+    CalculaRuido(pontob, pontoc, pontod, V);
+
+    const ValidaDados = Number(SNd.innerHTML);
+
+    if (isNaN(ValidaDados)) Limpar(e);
   }
 
-  function CalculaRuido(pontob, pontoc, pontod) {
+  function CalculaRuido(pontob, pontoc, pontod, V) {
     //Ponto A
-    const Ntx = -Number(sntx) + Number(pontoA);
+    const Ntx = -Number(V.sntx) + Number(V.pontoA);
     NA.innerHTML = Ntx.toFixed(2);
-
     //Ponto B
-    const Npontob = Number(Ntx) - Number(at1);
+    const Npontob = Number(Ntx) - Number(V.at1);
     NB.innerHTML = Npontob.toFixed(2);
-
     // S/N
     SNb.innerHTML = (pontob - Npontob).toFixed(2);
-
     //Ponto C
-    let Npontoc = Number(Npontob) + Number(amp);
-    Npontoc = converteParaWatts(Npontoc) + converteParaWatts(potrui);
+    let Npontoc = Number(Npontob) + Number(V.amp);
+    Npontoc = converteParaWatts(Npontoc) + converteParaWatts(V.potrui);
     Npontoc = converteParaDbm(Npontoc);
     NC.innerHTML = Npontoc.toFixed(2);
-
     // S/N
     SNc.innerHTML = (pontoc - Npontoc).toFixed(2);
-
     //Ponto D
-    let Npontod = Npontoc - at2;
+    const Npontod = Npontoc - V.at2;
     ND.innerHTML = Npontod.toFixed(2);
-
     // S/N
     SNd.innerHTML = (pontod - Npontod).toFixed(2);
   }
@@ -196,186 +193,55 @@ function App() {
         <img src={Sistema} alt="" />
         <div className="EntradaSaida">
           <form action="">
-            <div className="divInput">
-              <label htmlFor="">Ponto A</label>
-              <div className="inputESelect">
-                <input
-                  type="text"
-                  name=""
-                  id="focus"
-                  className="input"
-                  placeholder="Digite um valor"
-                  value={pontoA}
-                  onKeyDown={(e) => (VerificaNumero(e))}       
-                  onChange={(e) => { numeroPermitido ? setPontoA(e.target.value) : e.target.value = ""}}
-                />
-                <select name="" id="operador1">
-                  <option value="db">db</option>
-                  <option value="mW">mW</option>
-                  <option value="µW">µW</option>
-                  <option value="nW">nW</option>
-                  <option value="pW">pW</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="divInput">
-              <label htmlFor="">Atenuação 1</label>
-              <div className="inputESelect">
-                <input
-                  type="text"
-                  name=""
-                  id=""
-                  className="input"
-                  placeholder="Digite um valor"
-                  value={at1}         
-                  onKeyDown={(e) => (VerificaNumero(e))}       
-                  onChange={(e) => { numeroPermitido ? setAt1(e.target.value) : e.target.value = ""}}
-                  
-                />
-                <select name="" id="operador2">
-                  <option value="db">db</option>
-                  <option value="mW">mW</option>
-                  <option value="µW">µW</option>
-                  <option value="nW">nW</option>
-                  <option value="pW">pW</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="divInput">
-              <label htmlFor="">Amplificador</label>
-              <div className="inputESelect">
-                <input
-                  type="text"
-                  name=""
-                  id=""
-                  className="input"
-                  placeholder="Digite um valor"
-                  value={amp}
-                  onKeyDown={(e) => (VerificaNumero(e))}       
-                  onChange={(e) => { numeroPermitido ? setAmp(e.target.value) : e.target.value = ""}}
-                />
-                <select name="" id="operador3">
-                  <option value="db">db</option>
-                  <option value="mW">mW</option>
-                  <option value="µW">µW</option>
-                  <option value="nW">nW</option>
-                  <option value="pW">pW</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="divInput">
-              <label htmlFor="">Potência de ruído do Amplificador</label>
-              <div className="inputESelect">
-                <input
-                  type="text"
-                  name=""
-                  id=""
-                  className="input"
-                  placeholder="Digite um valor"
-                  value={potrui}
-                  onKeyDown={(e) => (VerificaNumero(e))}       
-                  onChange={(e) => { numeroPermitido ? setPotrui(e.target.value) : e.target.value = ""}}
-                />
-                <select name="" id="operador4">
-                  <option value="db">db</option>
-                  <option value="mW">mW</option>
-                  <option value="µW">µW</option>
-                  <option value="nW">nW</option>
-                  <option value="pW">pW</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="divInput">
-              <label htmlFor="">Atenuação 2</label>
-              <div className="inputESelect">
-                <input
-                  type="text"
-                  name=""
-                  id=""
-                  className="input"
-                  placeholder="Digite um valor"
-                  value={at2}
-                  onKeyDown={(e) => (VerificaNumero(e))}       
-                  onChange={(e) => { numeroPermitido ? setAt2(e.target.value) : e.target.value = ""}}
-                />
-                <select name="" id="operador5">
-                  <option value="db">db</option>
-                  <option value="mW">mW</option>
-                  <option value="µW">µW</option>
-                  <option value="nW">nW</option>
-                  <option value="pW">pW</option>
-                </select>
-              </div>
-            </div>
-            <div className="divInput">
-              <label htmlFor="">S/N no TX</label>
-              <div className="inputESelect">
-                <input
-                  type="text"
-                  name=""
-                  id=""
-                  className="input"
-                  placeholder="Digite um valor"
-                  value={sntx}
-                  onKeyDown={(e) => (VerificaNumero(e))}       
-                  onChange={(e) => { numeroPermitido ? setSntx(e.target.value) : e.target.value = ""}}
-                />
-                <select name="" id="operador6">
-                  <option value="db">db</option>
-                  <option value="mW">mW</option>
-                  <option value="µW">µW</option>
-                  <option value="nW">nW</option>
-                  <option value="pW">pW</option>
-                </select>
-              </div>
-            </div>
+            <Input
+              name="Ponto A"
+              variavel={pontoA}
+              setstate={setPontoA}
+              operador="operador1"
+              id="focus"
+            />
+            <Input
+              name="Atenuação 1"
+              variavel={at1}
+              setstate={setAt1}
+              operador="operador2"
+              id="input2"
+            />
+            <Input
+              name="Amplificador"
+              variavel={amp}
+              setstate={setAmp}
+              operador="operador3"
+              id="input3"
+            />
+            <Input
+              name="Potência de ruído no Amplificador"
+              variavel={potrui}
+              setstate={setPotrui}
+              operador="operador4"
+              id="input4"
+            />
+            <Input
+              name="Atenuação 2"
+              variavel={at2}
+              setstate={setAt2}
+              operador="operador5"
+              id="input5"
+            />
+            <Input
+              name="S/N no TX"
+              variavel={sntx}
+              setstate={setSntx}
+              operador="operador6"
+              id="input6"
+            />
             <p className="alerta hide">Preencha todos os campos!</p>
-            <div className="botoes">            
-            <button onClick={(e) => CalculaSinais(e)}>Calcular</button>
-            <button onClick={(e) => Limpar(e)}>Limpar</button>
+            <div className="botoes">
+              <button onClick={(e) => Limpar(e)}>Limpar</button>
+              <button onClick={(e) => CalculaSinais(e)}>Calcular</button>
             </div>
           </form>
-
-          <table>
-            <thead>
-              <tr>
-                <th>Ponto</th>
-                <th>Sinal (dbm)</th>
-                <th>Ruído (dbm)</th>
-                <th>S/N (db)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>A</td>
-                <td className="SinalPontoA">0</td>
-                <td className="RuidoPontoA">0</td>
-                <td className="SNA">0</td>
-              </tr>
-              <tr>
-                <td>B</td>
-                <td className="SinalPontoB">0</td>
-                <td className="RuidoPontoB">0</td>
-                <td className="SNB">0</td>
-              </tr>
-              <tr>
-                <td>C</td>
-                <td className="SinalPontoC">0</td>
-                <td className="RuidoPontoC">0</td>
-                <td className="SNC">0</td>
-              </tr>
-              <tr>
-                <td>D</td>
-                <td className="SinalPontoD">0</td>
-                <td className="RuidoPontoD">0</td>
-                <td className="SND">0</td>
-              </tr>
-            </tbody>
-          </table>
+          <Tabela />
         </div>
       </AppStyle>
     </>
