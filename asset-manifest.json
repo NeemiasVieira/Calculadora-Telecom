@@ -1,8 +1,7 @@
 {
   "files": {
     "main.css": "/Calculadora-Telecom/static/css/main.ffc7a322.css",
-    "main.js": "/Calculadora-Telecom/static/js/main.2ca349dd.js",
-    "static/js/787.cc0afcb0.chunk.js": "/Calculadora-Telecom/static/js/787.cc0afcb0.chunk.js",
+    "main.js": "/Calculadora-Telecom/static/js/main.8ddf811a.js",
     "static/media/montserrat-all-400-normal.woff": "/Calculadora-Telecom/static/media/montserrat-all-400-normal.327fab0afc997a2d9b16.woff",
     "static/media/montserrat-latin-400-normal.woff2": "/Calculadora-Telecom/static/media/montserrat-latin-400-normal.acb6629fe45c43ad5d8b.woff2",
     "static/media/montserrat-latin-ext-400-normal.woff2": "/Calculadora-Telecom/static/media/montserrat-latin-ext-400-normal.0204ec08a4b574088f02.woff2",
@@ -11,11 +10,10 @@
     "static/media/montserrat-vietnamese-400-normal.woff2": "/Calculadora-Telecom/static/media/montserrat-vietnamese-400-normal.8f3f4c99eb0eeb5990f1.woff2",
     "index.html": "/Calculadora-Telecom/index.html",
     "main.ffc7a322.css.map": "/Calculadora-Telecom/static/css/main.ffc7a322.css.map",
-    "main.2ca349dd.js.map": "/Calculadora-Telecom/static/js/main.2ca349dd.js.map",
-    "787.cc0afcb0.chunk.js.map": "/Calculadora-Telecom/static/js/787.cc0afcb0.chunk.js.map"
+    "main.8ddf811a.js.map": "/Calculadora-Telecom/static/js/main.8ddf811a.js.map"
   },
   "entrypoints": [
     "static/css/main.ffc7a322.css",
-    "static/js/main.2ca349dd.js"
+    "static/js/main.8ddf811a.js"
   ]
 }
