@@ -6,8 +6,10 @@ import { useState } from "react";
 import { Tabela } from "./Componentes/Tabela/Tabela";
 import { Input } from "./Componentes/Input/Input";
 
-function converteParaWatts(dbm) {
-  if (dbm === 0) return 0;
+function converteParaWatts(dbm, valorEmW) {
+  //Verifica se o valor que está recebendo é DBM ou W pois sem verificar não seria possível usar 1mW já que é igual a 0db.
+  if (valorEmW && dbm === 0) return 0.001;
+  if (!valorEmW && dbm === 0) return 0;
   const W = 10 ** ((dbm - 30) / 10);
   return W;
 }
@@ -19,6 +21,7 @@ function converteParaDbm(w) {
 }
 
 function elevaNum(num, select) {
+  //Essa função pega o valor e sua respectiva unidade, transforma o número e converte para dbm.
   num = Number(num);
   const valor = select.value;
   switch (valor) {
@@ -51,6 +54,7 @@ function elevaNum(num, select) {
 
 function App() {
   //#region Variáveis do App
+  //Define os states interligados aos inputs
   let [pontoA, setPontoA] = useState("");
   let [at1, setAt1] = useState("");
   let [amp, setAmp] = useState("");
@@ -58,6 +62,7 @@ function App() {
   let [potrui, setPotrui] = useState("");
   let [sntx, setSntx] = useState("");
 
+  //Define as variáveis que serão responsáveis por alterar a tabela.
   const SinalPontoA = document.querySelector(".SinalPontoA");
   const SinalPontoB = document.querySelector(".SinalPontoB");
   const SinalPontoC = document.querySelector(".SinalPontoC");
@@ -109,7 +114,8 @@ function App() {
   }
 
   function CalculaSinais(e) {
-    e.preventDefault();
+    e.preventDefault(); //Impede o carregamento padrão da página sem necessidade
+    //Define os selects e a mensagem de alerta
     const paragrafoDeAlerta = document.querySelector(".alerta");
     const select1 = document.querySelector("#operador1");
     const select2 = document.querySelector("#operador2");
@@ -118,7 +124,9 @@ function App() {
     const select5 = document.querySelector("#operador5");
     const select6 = document.querySelector("#operador6");
     const V = {
-      //Valores para calculos
+      //Valores para calculos,
+      //esse objeto permite que o programa posteriormente reescreva valores em cima para novos calculos,
+      //sem precisar atualizar a página.
       pontoA: elevaNum(pontoA, select1),
       at1: elevaNum(at1, select2),
       amp: elevaNum(amp, select3),
@@ -126,24 +134,31 @@ function App() {
       at2: elevaNum(at2, select5),
       sntx: elevaNum(sntx, select6),
     };
+
+    //Verifica se todos os campos foram preenchidos.
     if (!amp || !at1 || !at2 || !pontoA || !potrui || !sntx) {
       paragrafoDeAlerta.classList.remove("hide");
       return;
     }
     paragrafoDeAlerta.classList.add("hide");
 
+    //Calcula os sinais
     const pontob = V.pontoA - Number(V.at1);
     const pontoc = pontob + Number(V.amp);
     const pontod = pontoc - Number(V.at2);
 
-    SinalPontoA.innerHTML = parseFloat(V.pontoA).toFixed(2);
-    SinalPontoB.innerHTML = pontob.toFixed(2);
-    SinalPontoC.innerHTML = pontoc.toFixed(2);
-    SinalPontoD.innerHTML = pontod.toFixed(2);
-    SNa.innerHTML = parseFloat(V.sntx).toFixed(2);
+    //Exibe os valores na tabela
+    SinalPontoA.innerHTML = parseFloat(V.pontoA).toFixed(3);
+    SinalPontoB.innerHTML = pontob.toFixed(3);
+    SinalPontoC.innerHTML = pontoc.toFixed(3);
+    SinalPontoD.innerHTML = pontod.toFixed(3);
+    SNa.innerHTML = parseFloat(V.sntx).toFixed(3);
+
+    //Passa para a função de calcular os ruidos passando como parâmetros o que já foi calculado
 
     CalculaRuido(pontob, pontoc, pontod, V);
 
+    //Garante que se algo for digitado errado (letras), a tabela não venha com nenhum NaN
     const ValidaDados = Number(SNd.innerHTML);
 
     if (isNaN(ValidaDados)) Limpar(e);
@@ -152,24 +167,33 @@ function App() {
   function CalculaRuido(pontob, pontoc, pontod, V) {
     //Ponto A
     const Ntx = -Number(V.sntx) + Number(V.pontoA);
-    NA.innerHTML = Ntx.toFixed(2);
+    NA.innerHTML = Ntx.toFixed(3);
     //Ponto B
     const Npontob = Number(Ntx) - Number(V.at1);
-    NB.innerHTML = Npontob.toFixed(2);
+    NB.innerHTML = Npontob.toFixed(3);
     // S/N
-    SNb.innerHTML = (pontob - Npontob).toFixed(2);
+    SNb.innerHTML = (pontob - Npontob).toFixed(3);
     //Ponto C
-    let Npontoc = Number(Npontob) + Number(V.amp);
-    Npontoc = converteParaWatts(Npontoc) + converteParaWatts(V.potrui);
+    let Npontoc = Number(Npontob) + Number(V.amp);    
+
+    //Verifica se o valor que vai ser convertido da potência do ruído é em W ou db
+    const select4 = document.querySelector("#operador4");
+    if (select4.value === "db"){
+    Npontoc = converteParaWatts(Npontoc) + converteParaWatts(V.potrui, false);
+    }else{
+      if (Number(potrui) === 0) Npontoc = converteParaWatts(Npontoc) + converteParaWatts(V.potrui, false);
+      else Npontoc = converteParaWatts(Npontoc) + converteParaWatts(V.potrui, true);
+    }
     Npontoc = converteParaDbm(Npontoc);
-    NC.innerHTML = Npontoc.toFixed(2);
+    console.log(Npontoc)
+    NC.innerHTML = Npontoc.toFixed(8);
     // S/N
-    SNc.innerHTML = (pontoc - Npontoc).toFixed(2);
+    SNc.innerHTML = (pontoc - Npontoc).toFixed(3);
     //Ponto D
     const Npontod = Npontoc - V.at2;
-    ND.innerHTML = Npontod.toFixed(2);
+    ND.innerHTML = Npontod.toFixed(3);
     // S/N
-    SNd.innerHTML = (pontod - Npontod).toFixed(2);
+    SNd.innerHTML = (pontod - Npontod).toFixed(3);
   }
 
   return (
